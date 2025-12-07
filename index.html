@@ -30,6 +30,9 @@
         body { font-family: 'Inter', sans-serif; }
         /* Smooth scrolling */
         html { scroll-behavior: smooth; }
+        /* Hide scrollbar for clean modal */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -56,6 +59,7 @@
         const ArrowRight = (props) => <IconBase {...props}><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></IconBase>;
         const Info = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></IconBase>;
         const ShieldCheck = (props) => <IconBase {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></IconBase>;
+        const CalendarIcon = (props) => <IconBase {...props}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></IconBase>;
 
 
         const HVACBookingPage = () => {
@@ -376,6 +380,23 @@
                           
                           {cart.map((item, i) => <input key={i} type="hidden" name={`Item ${i+1}`} value={`${item.name} - $${item.price}`} />)}
                           <input type="hidden" name="Total" value={`$${calculateTotal()}`} />
+
+                          {/* DATE & TIME PICKER SECTION */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Preferred Date</label>
+                                <input required type="date" name="preferred_date" className="w-full bg-white border border-slate-300 rounded-lg p-3 focus:border-sky-500 outline-none" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Time Window</label>
+                                <select required name="preferred_time" className="w-full bg-white border border-slate-300 rounded-lg p-3 focus:border-sky-500 outline-none">
+                                    <option value="">Select...</option>
+                                    <option value="Morning (8am - 12pm)">Morning (8am - 12pm)</option>
+                                    <option value="Afternoon (12pm - 4pm)">Afternoon (12pm - 4pm)</option>
+                                    <option value="Evening (4pm - 8pm)">Evening (4pm - 8pm)</option>
+                                </select>
+                            </div>
+                          </div>
 
                           <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Full Name</label><input required type="text" name="name" className="w-full bg-white border border-slate-300 rounded-lg p-3 focus:border-sky-500 outline-none" placeholder="John Doe" /></div>
                           <div><label className="block text-xs font-bold text-slate-500 uppercase mb-1">Phone</label><input required type="tel" name="phone" className="w-full bg-white border border-slate-300 rounded-lg p-3 focus:border-sky-500 outline-none" placeholder="(313) 555-0123" /></div>
