@@ -28,11 +28,13 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Smooth scrolling */
         html { scroll-behavior: smooth; }
-        /* Hide scrollbar for clean modal */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Custom Gradients from your landing page */
+        .bg-brand-gradient { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+        .bg-cta-gradient { background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -41,7 +43,7 @@
     <script type="text/babel">
         const { useState, useRef, useEffect } = React;
 
-        // --- ICONS (Inlined for standalone usage) ---
+        // --- ICONS ---
         const IconBase = ({ children, size = 24, className = "", ...props }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>{children}</svg>
         );
@@ -59,8 +61,8 @@
         const ArrowRight = (props) => <IconBase {...props}><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></IconBase>;
         const Info = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></IconBase>;
         const ShieldCheck = (props) => <IconBase {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></IconBase>;
-        const CalendarIcon = (props) => <IconBase {...props}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></IconBase>;
-
+        const ChevronDown = (props) => <IconBase {...props}><polyline points="6 9 12 15 18 9"></polyline></IconBase>;
+        const Star = (props) => <IconBase {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></IconBase>;
 
         const HVACBookingPage = () => {
           const [view, setView] = useState('home'); 
@@ -69,7 +71,9 @@
           const [isOrderPlaced, setIsOrderPlaced] = useState(false);
           const [isSubmitting, setIsSubmitting] = useState(false);
           const [showItemDetails, setShowItemDetails] = useState(null);
+          const [showTerms, setShowTerms] = useState(false);
           const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+          const [openFaq, setOpenFaq] = useState(null);
           
           const menuSectionRef = useRef(null);
 
@@ -122,15 +126,22 @@
             {
               id: 'plans',
               title: 'Service Plans',
-              subtitle: 'Maintenance Memberships',
+              subtitle: 'VIP Maintenance Membership',
               icon: <ShieldCheck size={40} className="text-purple-500" />,
               color: 'bg-purple-50',
               accent: 'border-purple-500',
               textAccent: 'text-purple-600',
+              specialLayout: true, // Triggers rich view
               items: [
-                { id: 'p1', name: 'Mechanical Temp Service Plan', description: '2 Visits/Yr + Priority Status + Discounts.', price: 19, isSubscription: true, popular: true, details: 'Total peace of mind. Includes Fall and Spring tune-ups and 15% off repairs.', duration: 'Monthly' }
+                { id: 'p1', name: 'Mechanical Temp VIP Plan', description: '2 Visits/Yr + Priority Status + Discounts.', price: 19, isSubscription: true, popular: true, details: 'Total peace of mind. Includes Fall and Spring tune-ups and 15% off repairs.', duration: 'Monthly' }
               ]
             }
+          ];
+
+          const faqs = [
+            { q: "What if I need a major repair?", a: "Our membership covers basic maintenance. For major repairs (compressors, motors), members get an exclusive 15% discount on labor and 10% off parts." },
+            { q: "Is there a contract?", a: "No long-term contracts. It is a simple month-to-month subscription you can cancel anytime." },
+            { q: "How fast is 'Priority Service'?", a: "You jump to the front of the line. We guarantee an appointment within 24 hours, often same-day." }
           ];
 
           // --- LOGIC ---
@@ -207,6 +218,93 @@
             </footer>
           );
 
+          // --- SPECIAL PLAN VIEW COMPONENT ---
+          const PlanView = ({ category }) => {
+             const planItem = category.items[0];
+             
+             return (
+               <div className="animate-in slide-in-from-right duration-300">
+                 {/* Special Header for Plans */}
+                 <div className="bg-brand-gradient text-white pt-8 pb-12 px-6 shadow-lg text-center relative overflow-hidden">
+                    <div className="relative z-10 max-w-2xl mx-auto">
+                        <button onClick={() => setView('home')} className="absolute left-0 top-0 flex items-center gap-1 text-xs font-bold text-white/80 hover:text-white uppercase tracking-wider">
+                           <ChevronLeft size={14} /> Back
+                        </button>
+                        <ShieldCheck size={56} className="mx-auto mb-4 text-sky-300 opacity-90" />
+                        <h1 className="text-3xl md:text-4xl font-black mb-2">Total Peace of Mind</h1>
+                        <p className="text-sky-100 text-lg mb-6">Never worry about unexpected repairs again.</p>
+                        <div className="inline-block bg-white/10 backdrop-blur-md rounded-full px-6 py-2 border border-white/20">
+                           <span className="text-2xl font-bold text-white">$19</span><span className="text-sm text-sky-200">/mo</span>
+                        </div>
+                    </div>
+                 </div>
+
+                 <div className="max-w-3xl mx-auto px-6 -mt-8 relative z-20 pb-24">
+                    {/* Benefits Card */}
+                    <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-slate-100">
+                        <h3 className="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
+                           <Check className="text-green-500" /> What's Included
+                        </h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                           <ul className="space-y-3">
+                              <li className="flex gap-3 text-sm text-slate-600"><span className="text-green-500 font-bold">✓</span> 2 Annual Tune-Ups (Spring/Fall)</li>
+                              <li className="flex gap-3 text-sm text-slate-600"><span className="text-green-500 font-bold">✓</span> Priority Service Status</li>
+                              <li className="flex gap-3 text-sm text-slate-600"><span className="text-green-500 font-bold">✓</span> 15% Off All Repairs</li>
+                           </ul>
+                           <ul className="space-y-3">
+                              <li className="flex gap-3 text-sm text-slate-600"><span className="text-green-500 font-bold">✓</span> No Overtime Charges</li>
+                              <li className="flex gap-3 text-sm text-slate-600"><span className="text-green-500 font-bold">✓</span> 10% Off New Systems</li>
+                              <li className="flex gap-3 text-sm text-slate-600"><span className="text-green-500 font-bold">✓</span> Standard Filters Included</li>
+                           </ul>
+                        </div>
+                        <button 
+                           onClick={() => { addToCart(planItem); setView('checkout'); }}
+                           className="w-full mt-6 bg-cta-gradient text-white font-bold py-4 rounded-xl shadow-lg hover:opacity-90 transform transition hover:-translate-y-1"
+                        >
+                           Join The Club - $19/mo
+                        </button>
+                        <p className="text-center text-xs text-slate-400 mt-3">Cancel anytime. 30-day money-back guarantee.</p>
+                    </div>
+
+                    {/* Testimonial */}
+                    <div className="bg-slate-50 border border-slate-200 p-6 rounded-xl mb-8 relative">
+                       <div className="flex gap-1 text-yellow-400 mb-2">
+                          {[1,2,3,4,5].map(i => <Star key={i} size={16} fill="currentColor" />)}
+                       </div>
+                       <p className="text-slate-600 italic text-sm mb-3">"My AC died in July and they had a tech out the same day because I was a member. Saved me over $400 on the repair!"</p>
+                       <p className="font-bold text-slate-800 text-sm">– Sarah Martinez, Southfield</p>
+                    </div>
+
+                    {/* FAQs */}
+                    <div className="space-y-3 mb-8">
+                       <h3 className="font-bold text-slate-800 text-lg mb-2">Common Questions</h3>
+                       {faqs.map((faq, i) => (
+                          <div key={i} className="border border-slate-200 rounded-lg overflow-hidden bg-white">
+                             <button 
+                                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                                className="w-full flex justify-between items-center p-4 text-left font-semibold text-sm text-slate-700 hover:bg-slate-50"
+                             >
+                                {faq.q}
+                                <ChevronDown size={16} className={`transition-transform ${openFaq === i ? 'rotate-180' : ''}`} />
+                             </button>
+                             {openFaq === i && (
+                                <div className="p-4 pt-0 text-sm text-slate-500 bg-slate-50 border-t border-slate-100">
+                                   {faq.a}
+                                </div>
+                             )}
+                          </div>
+                       ))}
+                    </div>
+
+                    {/* Terms Link */}
+                    <div className="text-center">
+                       <button onClick={() => setShowTerms(true)} className="text-xs text-slate-400 underline hover:text-slate-600">View Full Membership Terms</button>
+                    </div>
+                 </div>
+               </div>
+             );
+          };
+
           // --- VIEWS ---
           if (isOrderPlaced) {
             return (
@@ -229,6 +327,29 @@
             <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20 md:pb-0">
               <Navbar />
 
+              {/* TERMS MODAL */}
+              {showTerms && (
+                 <div className="fixed inset-0 z-[70] bg-white overflow-y-auto animate-in slide-in-from-bottom duration-300">
+                    <div className="p-6 max-w-2xl mx-auto">
+                       <button onClick={() => setShowTerms(false)} className="mb-6 flex items-center gap-2 text-slate-600 font-bold"><ChevronLeft /> Back to Plan</button>
+                       <h2 className="text-2xl font-bold mb-4">Membership Terms</h2>
+                       <div className="prose prose-sm text-slate-600">
+                          <h3 className="font-bold text-slate-900 mt-4">1. Equipment Assessment</h3>
+                          <p>A mandatory inspection will be scheduled within 30 days. We reserve the right to refund/cancel if equipment poses safety hazards or is beyond economical repair (>60% replacement value).</p>
+                          <h3 className="font-bold text-slate-900 mt-4">2. Disqualification Criteria</h3>
+                          <ul className="list-disc pl-5 space-y-1">
+                             <li>Cracked heat exchangers</li>
+                             <li>Major refrigerant leaks</li>
+                             <li>Code violations or unsafe modifications</li>
+                          </ul>
+                          <h3 className="font-bold text-slate-900 mt-4">3. Cancellation</h3>
+                          <p>You may cancel at any time. 30-day money back guarantee applies to the first month only.</p>
+                       </div>
+                    </div>
+                 </div>
+              )}
+
+              {/* ITEM DETAILS MODAL */}
               {showItemDetails && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
                   <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
@@ -295,42 +416,47 @@
                 </div>
               )}
 
+              {/* CATEGORY VIEW - HANDLES BOTH REGULAR & PLAN LAYOUTS */}
               {view === 'category' && activeCategory && (
-                <div className="animate-in slide-in-from-right duration-300 max-w-3xl mx-auto min-h-screen bg-white">
-                  <div className={`${activeCategory.color} sticky top-[72px] z-40 p-6 shadow-sm`}>
-                    <button onClick={() => setView('home')} className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 mb-4 bg-white/50 w-fit px-3 py-1 rounded-full backdrop-blur-sm">
-                      <ChevronLeft size={16} /> Back to Categories
-                    </button>
-                    <div className="flex items-center gap-4">
-                      <div className="bg-white p-3 rounded-xl shadow-sm text-slate-800">{activeCategory.icon}</div>
-                      <div>
-                        <h1 className="text-2xl font-bold text-slate-900">{activeCategory.title}</h1>
-                        <p className="text-slate-600">{activeCategory.subtitle}</p>
+                activeCategory.specialLayout ? (
+                   <PlanView category={activeCategory} />
+                ) : (
+                  <div className="animate-in slide-in-from-right duration-300 max-w-3xl mx-auto min-h-screen bg-white">
+                    <div className={`${activeCategory.color} sticky top-[72px] z-40 p-6 shadow-sm`}>
+                      <button onClick={() => setView('home')} className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 mb-4 bg-white/50 w-fit px-3 py-1 rounded-full backdrop-blur-sm">
+                        <ChevronLeft size={16} /> Back to Categories
+                      </button>
+                      <div className="flex items-center gap-4">
+                        <div className="bg-white p-3 rounded-xl shadow-sm text-slate-800">{activeCategory.icon}</div>
+                        <div>
+                          <h1 className="text-2xl font-bold text-slate-900">{activeCategory.title}</h1>
+                          <p className="text-slate-600">{activeCategory.subtitle}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="p-6 pb-32">
-                    {activeCategory.items.map((item) => (
-                      <div key={item.id} className="bg-white border border-slate-100 rounded-xl p-5 shadow-sm mb-4 relative overflow-hidden hover:border-sky-200 transition-colors">
-                        {item.popular && <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-1 rounded-bl-lg">POPULAR</div>}
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-bold text-slate-800 text-lg">{item.name}</h3>
-                          <div className="font-bold text-lg text-slate-900">${item.price}{item.isSubscription && <span className="text-xs font-normal text-slate-500">/mo</span>}</div>
+                    <div className="p-6 pb-32">
+                      {activeCategory.items.map((item) => (
+                        <div key={item.id} className="bg-white border border-slate-100 rounded-xl p-5 shadow-sm mb-4 relative overflow-hidden hover:border-sky-200 transition-colors">
+                          {item.popular && <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-1 rounded-bl-lg">POPULAR</div>}
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-bold text-slate-800 text-lg">{item.name}</h3>
+                            <div className="font-bold text-lg text-slate-900">${item.price}{item.isSubscription && <span className="text-xs font-normal text-slate-500">/mo</span>}</div>
+                          </div>
+                          <p className="text-slate-500 text-sm mb-4">{item.description}</p>
+                          <div className="flex gap-3">
+                            <button onClick={() => setShowItemDetails(item)} className="flex-1 py-2 px-3 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 flex items-center justify-center gap-2">
+                              <Info size={16} /> Details
+                            </button>
+                            <button onClick={(e) => { e.stopPropagation(); addToCart(item); }} className="flex-1 py-2 px-3 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold shadow-sm flex items-center justify-center gap-2">
+                              <Plus size={16} /> Add
+                            </button>
+                          </div>
                         </div>
-                        <p className="text-slate-500 text-sm mb-4">{item.description}</p>
-                        <div className="flex gap-3">
-                          <button onClick={() => setShowItemDetails(item)} className="flex-1 py-2 px-3 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 flex items-center justify-center gap-2">
-                            <Info size={16} /> Details
-                          </button>
-                          <button onClick={(e) => { e.stopPropagation(); addToCart(item); }} className="flex-1 py-2 px-3 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold shadow-sm flex items-center justify-center gap-2">
-                            <Plus size={16} /> Add
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )
               )}
 
               {view === 'checkout' && (
